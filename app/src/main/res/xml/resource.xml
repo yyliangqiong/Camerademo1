@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListPreference
-        android:defaultValue="wuhan"
-        android:entries="@addr/qu_add"
-        android:entryValues="@addr/qu_add"
-        android:key="qu_add"
-        android:title="查询地址"/>
-</PreferenceScreen>

@@ -9,6 +9,6 @@ public class SettingFragment extends PreferenceFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preference);
-        addPreferencesFromResource(R.xml.resource);
+
     }
 }
