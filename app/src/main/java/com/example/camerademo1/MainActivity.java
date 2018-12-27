@@ -11,6 +11,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -37,13 +39,15 @@ public class MainActivity extends Activity {
                     n != PackageManager.PERMISSION_GRANTED) {
                 startRequestPermission();
             }
-        } else {
-            //添加自定义View
-//            CameraPreview mPreview = new CameraPreview(this);
-//            FrameLayout preview = findViewById(R.id.camera_preview);
-//            preview.addView(mPreview);
-//            Log.d(TAG, "where is the picture");
         }
+
+        Button buttonSetting=findViewById(R.id.button_settings);
+        buttonSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction().replace(R.id.camera_preview,new SettingFragment()).addToBackStack(null).commit();
+            }
+        });
     }
 
     private void startRequestPermission() {

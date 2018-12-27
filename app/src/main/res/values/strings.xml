@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">camerademo1</string>
+    <string name="setting_name">设置</string>
 </resources>
