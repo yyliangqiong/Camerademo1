@@ -20,7 +20,7 @@ import static android.content.ContentValues.TAG;
 
 
 public class MainActivity extends Activity {
-    private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE,
+    private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION};
 
     @Override
@@ -42,6 +42,7 @@ public class MainActivity extends Activity {
         }
 
         Button buttonSetting=findViewById(R.id.button_settings);
+
         buttonSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +62,7 @@ public class MainActivity extends Activity {
             CameraPreview mPreview = new CameraPreview(this);
             FrameLayout preview = findViewById(R.id.camera_preview);
             preview.addView(mPreview);
+            SettingFragment.passCamera(mPreview.getCameraInstance());
 
 
         }

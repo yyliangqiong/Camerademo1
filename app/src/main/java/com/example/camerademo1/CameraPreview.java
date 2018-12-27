@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 import java.io.IOException;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback{
-    private static final String TAG="CamerPreview";
+    private static final String TAG="CameraPreview";
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
@@ -20,15 +20,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
     }
 
-    private static Camera getCameraInstance(){
-        Camera c=null;
+    public Camera getCameraInstance(){
+        if(mCamera==null)
         try {
-            c=Camera.open();
+            mCamera=Camera.open();
         } catch (Exception e) {
 
             Log.d(TAG, "camera is not available ");
         }
-        return c;
+        return mCamera;
     }
 
 
