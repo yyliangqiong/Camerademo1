@@ -1,16 +1,20 @@
 package com.example.camerademo1;
 
+import android.content.SharedPreferences;
 import android.graphics.Picture;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceGroup;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingFragment extends PreferenceFragment {
+public class SettingFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     static Camera mCamera;
     static Camera.Parameters mParameters;
     public static final String KEY_PREF_PREV_SIZE = "preview_size";
@@ -36,11 +40,52 @@ public class SettingFragment extends PreferenceFragment {
         loadSupportedWhiteBalance();
         loadSupportedSceneMode();
         loadSupportedExposeCompensation();
+        initSummary(getPreferenceScreen());
     }
     public static void passCamera(Camera camera){
         mCamera=camera;
         mParameters=camera.getParameters();
     }
+
+    public static void setDefault(SharedPreferences sharedPrefs){
+        String valPreviewSize=sharedPrefs.getString(KEY_PREF_PREV_SIZE,null);
+        if (valPreviewSize==null){
+            SharedPreferences.Editor editor=sharedPrefs.edit();
+            editor.putString(KEY_PREF_PREV_SIZE,getDefaultPreviewSize());
+            editor.putString(KEY_PREF_PIC_SIZE,getDefaultPictureSize());
+            editor.putString(KEY_PREF_VIDEO_SIZE, getDefaultVideoSize());
+            editor.putString(KEY_PREF_FOCUS_MODE, getDefaultFocusMode());
+            editor.apply();
+        }
+    }
+
+
+    private static String getDefaultPreviewSize(){
+        Camera.Size previewSize=mParameters.getPreviewSize();
+        return previewSize.width+"x"+previewSize.height;
+    }
+
+    private static String getDefaultPictureSize(){
+        Camera.Size pictureSize=mParameters.getPictureSize();
+        return pictureSize.width+"x"+pictureSize.height;
+    }
+
+    private static String getDefaultVideoSize() {
+        Camera.Size VideoSize = mParameters.getPreferredPreviewSizeForVideo();
+        return VideoSize.width + "x" + VideoSize.height;
+    }
+
+    private static String getDefaultFocusMode(){
+        List<String> supportedFocusModes=mParameters.getSupportedFocusModes();
+        if(supportedFocusModes.contains("continuous-picture")){
+            return "continuous-picture";
+        }
+        return "continuous-video";
+    }
+
+
+
+
 
     private void loadSupportedPreviewSize() {
         cameraSizeListToListPreference(mParameters.getSupportedPreviewSizes(), KEY_PREF_PREV_SIZE);
@@ -96,5 +141,131 @@ public class SettingFragment extends PreferenceFragment {
         listPref.setEntryValues(charSeq);
     }
 
+
+    public static void init(SharedPreferences sharedPref) {
+        setPreviewSize(sharedPref.getString(KEY_PREF_PREV_SIZE,""));
+        setPictureSize(sharedPref.getString(KEY_PREF_PIC_SIZE, ""));
+        setFlashMode(sharedPref.getString(KEY_PREF_FLASH_MODE, ""));
+        setFocusMode(sharedPref.getString(KEY_PREF_FOCUS_MODE, ""));
+        setWhiteBalance(sharedPref.getString(KEY_PREF_WHITE_BALANCE, ""));
+        setSceneMode(sharedPref.getString(KEY_PREF_SCENE_MODE, ""));
+        setExposComp(sharedPref.getString(KEY_PREF_EXPOS_COMP, ""));
+        setJpegQuality(sharedPref.getString(KEY_PREF_JPEG_QUALITY, ""));
+        setGpsData(sharedPref.getBoolean(KEY_PREF_GPS_DATA, false));
+        mCamera.stopPreview();
+        mCamera.setParameters(mParameters);
+        mCamera.startPreview();
+    }
+
+    private static void setPreviewSize(String value){
+        String[] split=value.split("x");
+        mParameters.setPreviewSize(Integer.parseInt(split[0]),Integer.parseInt(split[1]));
+    }
+
+    private static void setPictureSize(String value) {
+        String[] split = value.split("x");
+        mParameters.setPictureSize(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+    }
+
+    private static void setFocusMode(String value){
+        mParameters.setFocusMode(value);
+    }
+
+    private static void setFlashMode(String value) {
+        mParameters.setFlashMode(value);
+    }
+
+    private static void setWhiteBalance(String value) {
+        mParameters.setWhiteBalance(value);
+    }
+
+    private static void setSceneMode(String value) {
+        mParameters.setSceneMode(value);
+    }
+
+    private static void setExposComp(String value){
+        mParameters.setExposureCompensation(Integer.parseInt(value));
+    }
+
+    private static void setJpegQuality(String value) {
+//        mParameters.setJpegQuality(Integer.parseInt(value));
+    }
+
+    private static void setGpsData(Boolean value) {
+        if (value.equals(false)) {
+            mParameters.removeGpsData();
+        }
+
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        updatePrefSummary(findPreference(key));
+        switch (key){
+            case KEY_PREF_PREV_SIZE:
+                setPreviewSize(sharedPreferences.getString(key,""));
+                break;
+            case KEY_PREF_PIC_SIZE:
+                setPictureSize(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_FOCUS_MODE:
+                setFocusMode(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_FLASH_MODE:
+                setFlashMode(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_WHITE_BALANCE:
+                setWhiteBalance(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_SCENE_MODE:
+                setSceneMode(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_EXPOS_COMP:
+                setExposComp(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_JPEG_QUALITY:
+                setJpegQuality(sharedPreferences.getString(key, ""));
+                break;
+            case KEY_PREF_GPS_DATA:
+                setGpsData(sharedPreferences.getBoolean(key, false));
+                break;
+        }
+        mCamera.stopPreview();
+        mCamera.setParameters(mParameters);
+        mCamera.startPreview();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+
+
+    private static void initSummary(Preference pref){
+        if(pref instanceof PreferenceGroup){
+            PreferenceGroup prefGroup=(PreferenceGroup)pref;
+            for(int i=0;i<prefGroup.getPreferenceCount();i++){
+                initSummary(prefGroup.getPreference(i));
+            }
+        }else {
+            updatePrefSummary(pref);
+        }
+    }
+
+    private static void updatePrefSummary(Preference pref){
+        if(pref instanceof ListPreference){
+            pref.setSummary(((ListPreference)pref).getEntry());
+        }
+    }
 
 }

@@ -36,6 +36,7 @@
         android:defaultValue="100"
         android:entries="@array/pref_jpegQuality"
         android:entryValues="@array/pref_jpegQuality"
+        android:key="jpeg_quality"
         android:title="照片品质"/>
 
 

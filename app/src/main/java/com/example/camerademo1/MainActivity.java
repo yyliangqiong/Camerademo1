@@ -2,9 +2,11 @@ package com.example.camerademo1;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -39,6 +41,15 @@ public class MainActivity extends Activity {
                     n != PackageManager.PERMISSION_GRANTED) {
                 startRequestPermission();
             }
+        }else {
+            CameraPreview mPreview = new CameraPreview(this);
+            FrameLayout preview = findViewById(R.id.camera_preview);
+            preview.addView(mPreview);
+            SettingFragment.passCamera(mPreview.getCameraInstance());
+            PreferenceManager.setDefaultValues(this,R.xml.preference,false);
+            SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
+            SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
+
         }
 
         Button buttonSetting=findViewById(R.id.button_settings);
@@ -62,9 +73,15 @@ public class MainActivity extends Activity {
             CameraPreview mPreview = new CameraPreview(this);
             FrameLayout preview = findViewById(R.id.camera_preview);
             preview.addView(mPreview);
-            SettingFragment.passCamera(mPreview.getCameraInstance());
 
+            SettingFragment.passCamera(mPreview.getCameraInstance());
+            PreferenceManager.setDefaultValues(this,R.xml.preference,false);
+            SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
+            SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
 
         }
     }
+
+
+
 }
