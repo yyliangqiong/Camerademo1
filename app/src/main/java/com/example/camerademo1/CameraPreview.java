@@ -33,6 +33,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public static final int MEDIA_TYPE_VIDEO=2;
     private Uri outputMediaFileUri;
     private String outputMediaFileType;
+    long time = 0;
 
 
     public CameraPreview(Context context) {
@@ -144,6 +145,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public boolean startRecording(){
         if (prepareVideoRecorder()){
             mMediaRecorder.start();
+            time = System.currentTimeMillis();
             return true;
         }else {
             releaseMediaRecorder();
@@ -152,8 +154,27 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void stopRecording(final ImageView view){
+        long spanTime = System.currentTimeMillis()-time;
+        if(spanTime<1000){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         if(mMediaRecorder!=null){
-            mMediaRecorder.stop();
+            mMediaRecorder.setOnErrorListener(null);
+            mMediaRecorder.setOnInfoListener(null);
+            mMediaRecorder.setPreviewDisplay(null);
+            try {
+                mMediaRecorder.stop();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Bitmap thumbnail= ThumbnailUtils.createVideoThumbnail(outputMediaFileUri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND);
             view.setImageBitmap(thumbnail);
         }
