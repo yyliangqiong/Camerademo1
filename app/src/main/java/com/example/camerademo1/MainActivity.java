@@ -23,7 +23,7 @@ import static android.content.ContentValues.TAG;
 
 public class MainActivity extends Activity {
     private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION};
+            Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,13 +42,39 @@ public class MainActivity extends Activity {
                 startRequestPermission();
             }
         }else {
-            CameraPreview mPreview = new CameraPreview(this);
+           final CameraPreview mPreview = new CameraPreview(this);
             FrameLayout preview = findViewById(R.id.camera_preview);
             preview.addView(mPreview);
             SettingFragment.passCamera(mPreview.getCameraInstance());
             PreferenceManager.setDefaultValues(this,R.xml.preference,false);
             SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
             SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
+
+
+            final Button buttonCapturePhoto=(Button)findViewById(R.id.button_capture_photo);
+
+            buttonCapturePhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPreview.takePicture();
+                }
+            });
+
+            final Button buttonCaptureVideo=(Button)findViewById(R.id.button_capture_video);
+
+            buttonCaptureVideo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mPreview.isRecording()){
+                        mPreview.stopRecording();
+                        buttonCaptureVideo.setText("录像");
+                    }else {
+                        if (mPreview.startRecording()){
+                            buttonCaptureVideo.setText("停止");
+                        }
+                    }
+                }
+            });
 
         }
 
@@ -60,6 +86,9 @@ public class MainActivity extends Activity {
                 getFragmentManager().beginTransaction().replace(R.id.camera_preview,new SettingFragment()).addToBackStack(null).commit();
             }
         });
+
+
+
     }
 
     private void startRequestPermission() {
@@ -70,7 +99,7 @@ public class MainActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 321) {
             //添加自定义View
-            CameraPreview mPreview = new CameraPreview(this);
+            final CameraPreview mPreview = new CameraPreview(this);
             FrameLayout preview = findViewById(R.id.camera_preview);
             preview.addView(mPreview);
 
@@ -78,6 +107,32 @@ public class MainActivity extends Activity {
             PreferenceManager.setDefaultValues(this,R.xml.preference,false);
             SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
             SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
+
+
+            final Button buttonCapturePhoto=(Button)findViewById(R.id.button_capture_photo);
+
+            buttonCapturePhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPreview.takePicture();
+                }
+            });
+
+            final Button buttonCaptureVideo=(Button)findViewById(R.id.button_capture_video);
+
+            buttonCaptureVideo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mPreview.isRecording()){
+                        mPreview.stopRecording();
+                        buttonCaptureVideo.setText("录像");
+                    }else {
+                        if (mPreview.startRecording()){
+                            buttonCaptureVideo.setText("停止");
+                        }
+                    }
+                }
+            });
 
         }
     }
