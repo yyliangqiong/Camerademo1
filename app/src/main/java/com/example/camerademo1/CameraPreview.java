@@ -2,15 +2,20 @@ package com.example.camerademo1;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -109,7 +114,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return outputMediaFileType;
     }
 
-    public void takePicture(){
+    public void takePicture(final ImageView view){
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -123,6 +128,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     fos.write(data);
                     fos.close();
 
+                    view.setImageURI(outputMediaFileUri);
                     camera.startPreview();
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, "File not found: "+e.getMessage());
@@ -145,9 +151,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return false;
     }
 
-    public void stopRecording(){
+    public void stopRecording(final ImageView view){
         if(mMediaRecorder!=null){
             mMediaRecorder.stop();
+            Bitmap thumbnail= ThumbnailUtils.createVideoThumbnail(outputMediaFileUri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND);
+            view.setImageBitmap(thumbnail);
         }
              releaseMediaRecorder();
     }

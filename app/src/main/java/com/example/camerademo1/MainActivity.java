@@ -2,6 +2,7 @@ package com.example.camerademo1;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import static android.content.ContentValues.TAG;
@@ -24,9 +26,13 @@ import static android.content.ContentValues.TAG;
 public class MainActivity extends Activity {
     private String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+    private CameraPreview mPreview;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -42,21 +48,16 @@ public class MainActivity extends Activity {
                 startRequestPermission();
             }
         }else {
-           final CameraPreview mPreview = new CameraPreview(this);
-            FrameLayout preview = findViewById(R.id.camera_preview);
-            preview.addView(mPreview);
-            SettingFragment.passCamera(mPreview.getCameraInstance());
-            PreferenceManager.setDefaultValues(this,R.xml.preference,false);
-            SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
-            SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
 
+            initCamera();
 
+            final ImageView mediaPreview=(ImageView)findViewById(R.id.media_preview);
             final Button buttonCapturePhoto=(Button)findViewById(R.id.button_capture_photo);
 
             buttonCapturePhoto.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPreview.takePicture();
+                    mPreview.takePicture(mediaPreview);
                 }
             });
 
@@ -66,7 +67,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     if (mPreview.isRecording()){
-                        mPreview.stopRecording();
+                        mPreview.stopRecording(mediaPreview);
                         buttonCaptureVideo.setText("录像");
                     }else {
                         if (mPreview.startRecording()){
@@ -76,7 +77,18 @@ public class MainActivity extends Activity {
                 }
             });
 
+            mediaPreview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(MainActivity.this,ShowPhotoVideo.class);
+                    intent.setDataAndType(mPreview.getOutputMediaFileUri(),mPreview.getOutputMediaFileType());
+                    startActivityForResult(intent,0);
+                }
+            });
+
         }
+
+
 
         Button buttonSetting=findViewById(R.id.button_settings);
 
@@ -87,8 +99,18 @@ public class MainActivity extends Activity {
             }
         });
 
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPreview=null;
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initCamera();
     }
 
     private void startRequestPermission() {
@@ -99,22 +121,16 @@ public class MainActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 321) {
             //添加自定义View
-            final CameraPreview mPreview = new CameraPreview(this);
-            FrameLayout preview = findViewById(R.id.camera_preview);
-            preview.addView(mPreview);
 
-            SettingFragment.passCamera(mPreview.getCameraInstance());
-            PreferenceManager.setDefaultValues(this,R.xml.preference,false);
-            SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
-            SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
-
+            initCamera();
+            final ImageView mediaPreview=(ImageView)findViewById(R.id.media_preview);
 
             final Button buttonCapturePhoto=(Button)findViewById(R.id.button_capture_photo);
 
             buttonCapturePhoto.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPreview.takePicture();
+                    mPreview.takePicture(mediaPreview);
                 }
             });
 
@@ -124,7 +140,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     if (mPreview.isRecording()){
-                        mPreview.stopRecording();
+                        mPreview.stopRecording(mediaPreview);
                         buttonCaptureVideo.setText("录像");
                     }else {
                         if (mPreview.startRecording()){
@@ -134,8 +150,41 @@ public class MainActivity extends Activity {
                 }
             });
 
+            mediaPreview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(MainActivity.this,ShowPhotoVideo.class);
+                    intent.setDataAndType(mPreview.getOutputMediaFileUri(),mPreview.getOutputMediaFileType());
+                    startActivityForResult(intent,0);
+                }
+            });
+
         }
+
+        }
+
+
+
+
+    private void initCamera(){
+
+        mPreview = new CameraPreview(this);
+        FrameLayout preview = findViewById(R.id.camera_preview);
+        preview.addView(mPreview);
+
+
+
+
+
+        SettingFragment.passCamera(mPreview.getCameraInstance());
+        PreferenceManager.setDefaultValues(this,R.xml.preference,false);
+        SettingFragment.setDefault(PreferenceManager.getDefaultSharedPreferences(this));
+        SettingFragment.init(PreferenceManager.getDefaultSharedPreferences(this));
+
+
     }
+
+
 
 
 

@@ -45,6 +45,14 @@
 
   </LinearLayout>
 
+  <ImageView
+      android:id="@+id/media_preview"
+      android:layout_width="60dp"
+      android:layout_height="60dp"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      android:background="#000"/>
+
 
 
  </RelativeLayout>
