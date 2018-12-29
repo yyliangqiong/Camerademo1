@@ -188,7 +188,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
     }
 
     private static void setJpegQuality(String value) {
-//        mParameters.setJpegQuality(Integer.parseInt(value));
+        mParameters.setJpegQuality(Integer.parseInt(value));
     }
 
     private static void setGpsData(Boolean value) {

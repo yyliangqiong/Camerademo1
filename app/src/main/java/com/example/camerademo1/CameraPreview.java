@@ -2,6 +2,7 @@ package com.example.camerademo1;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -12,6 +13,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG="CameraPreview";
     private SurfaceHolder mHolder;
     private Camera mCamera;
+//    public static final int MEDIA_TYPE_IMAGE=1;
+//    public static final int MEDIA_TYPE_VIDEO=2;
+//    private Uri outputMediaFileUri;
+//    private String outputMediaFileType;
 
 
     public CameraPreview(Context context) {
